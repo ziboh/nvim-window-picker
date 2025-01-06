@@ -31,8 +31,11 @@ function M:set_hint(hint)
 end
 
 function M:_get_windows()
-	local all_windows = vim.api.nvim_tabpage_list_wins(0)
-	return self.filter:filter_windows(all_windows)
+	local visible_wins = vim.tbl_filter(function(win)
+		local config = vim.api.nvim_win_get_config(win)
+		return config.relative == ''
+	end, vim.api.nvim_tabpage_list_wins(0))
+	return self.filter:filter_windows(visible_wins)
 end
 
 function M:_find_matching_win_for_char(user_input_char, windows)
